@@ -97,6 +97,18 @@ namespace TaskAuthenticationAuthorization
                         }
                 );
             context.SaveChanges();
+            context.Roles.AddRange(
+                    new Role
+                    {
+                        Name ="Buyer"
+
+                    },
+                    new Role
+                    {
+                        Name = "admin"
+                    }
+                );
+            context.SaveChanges();
         }
     }
  }

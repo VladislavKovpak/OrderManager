@@ -9,6 +9,8 @@ namespace TaskAuthenticationAuthorization.Models
 {
     public class ShoppingContext : DbContext
     {
+        public DbSet<Role> Roles { get; set; }
+
         public DbSet<Product> Products { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<SuperMarket> SuperMarkets { get; set; }
