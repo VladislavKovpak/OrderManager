@@ -6,8 +6,15 @@
 
 <h1>Supermarkets</h1>
 
+
 <p>
-    <a asp-action="Create">Create New</a>
+    @{
+    if (User.Identity.IsAuthenticated && User.IsInRole("admin"))
+    {
+       @:|
+       <a asp-action="Create">Create New</a>
+        }
+    }
 </p>
 <table class="table">
     <thead>
