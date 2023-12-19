@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using TaskAuthenticationAuthorization.Models;
 
 namespace TaskAuthenticationAuthorization.Controllers
 {
+    [Authorize(Roles = "admin")]
     public class CustomersController : Controller
     {
         private readonly ShoppingContext _context;
@@ -21,7 +23,6 @@ namespace TaskAuthenticationAuthorization.Controllers
         // GET: Customers
         public async Task<IActionResult> Index(string sortOrder, string searchString)
         {
-           
             ViewData["NameSortParam"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewData["AddressSortParam"] = sortOrder == "Address" ? "address_desc" : "Address";
             ViewData["CurrentFilter"] = searchString;
@@ -124,7 +125,22 @@ namespace TaskAuthenticationAuthorization.Controllers
             {
                 try
                 {
-                    _context.Update(customer);
+                    // Retrieve the existing customer from the database
+                    var existingCustomer = await _context.Customers.FindAsync(id);
+
+                    if (existingCustomer == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Update only the allowed properties
+                    existingCustomer.LastName = customer.LastName;
+                    existingCustomer.FirstName = customer.FirstName;
+                    existingCustomer.Address = customer.Address;
+                    existingCustomer.Discount = customer.Discount;
+
+                    // Mark the entity as modified and save changes
+                    _context.Update(existingCustomer);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
