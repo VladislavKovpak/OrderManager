@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace TaskAuthenticationAuthorization.Controllers
 {
@@ -30,7 +31,8 @@ namespace TaskAuthenticationAuthorization.Controllers
             var claims = new List<Claim>
                 {
                     new Claim(ClaimsIdentity.DefaultNameClaimType, customer.Email),
-                    new Claim(ClaimsIdentity.DefaultRoleClaimType, customer.Role?.Name)
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, customer.Role?.Name),
+                    new Claim("DiscountAccess", customer.Discount.Value.ToString())
                 };
 
             // create ClaimsIdentity object
@@ -55,14 +57,14 @@ namespace TaskAuthenticationAuthorization.Controllers
                 Customer customer = await _shoppingContext.Customers.FirstOrDefaultAsync(u => u.Email == model.Email);
                 if (customer == null)
                 {
-                    if (_shoppingContext.Roles.FirstOrDefaultAsync(r => r.Name == "user") == null)
+                    if (await _shoppingContext.Roles.FirstOrDefaultAsync(r => r.Name == "buyer") == null)
                     {
-                        _shoppingContext.Roles.Add(new Role { Name = "user" });
-                        await _shoppingContext.SaveChangesAsync();
+                        _shoppingContext.Roles.Add(new Role { Name = "buyer" });
+                        await _shoppingContext.SaveChangesAsync();  
                     }
 
-                    Role userRole = await _shoppingContext.Roles.FirstOrDefaultAsync(r => r.Name == "user");
-                    customer = new Customer { Email = model.Email, Password = model.Password, Role = userRole };
+                    Role userRole = await _shoppingContext.Roles.FirstOrDefaultAsync(r => r.Name == "buyer");
+                    customer = new Customer { Email = model.Email, Password = model.Password, Role = userRole, Discount = Discount.regular };
                    
                     _shoppingContext.Customers.Add(customer);
                     await _shoppingContext.SaveChangesAsync();
@@ -71,6 +73,7 @@ namespace TaskAuthenticationAuthorization.Controllers
 
                     await Authenticate(customerToAuthorize);
 
+                  
                     return RedirectToAction("Index", "Home");
                 }
                 else

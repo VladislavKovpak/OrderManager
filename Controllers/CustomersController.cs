@@ -28,6 +28,9 @@ namespace TaskAuthenticationAuthorization.Controllers
             ViewData["CurrentFilter"] = searchString;
             var customers = from s in _context.Customers
                             select s;
+
+            customers = customers.Include(c => c.Role);
+
             if (!String.IsNullOrEmpty(searchString))
             {
                 customers = customers.Where(s => s.LastName.Contains(searchString)

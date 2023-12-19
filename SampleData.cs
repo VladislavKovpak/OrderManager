@@ -36,7 +36,7 @@ namespace TaskAuthenticationAuthorization
 
             context.Roles.AddRange(
                 new Role { Name = "admin" },
-                new Role { Name = "user" }
+                new Role { Name = "buyer" }
                 );
             context.SaveChanges();
 
@@ -55,8 +55,8 @@ namespace TaskAuthenticationAuthorization
                         FirstName = "Ostap",
                         LastName = "Bender",
                         Address = "Rio de Zhmerinka",
-                        Discount = Discount.O,
-                        Role = context.Roles.FirstOrDefault(r => r.Name == "user")
+                        Discount = Discount.wholesale,
+                        Role = context.Roles.FirstOrDefault(r => r.Name == "buyer")
 
                     },
                     new Customer
@@ -64,7 +64,7 @@ namespace TaskAuthenticationAuthorization
                         FirstName = "Shura",
                         LastName = "Balaganov",
                         Address = "Odessa",
-                        Discount = Discount.R,
+                        Discount = Discount.regular,
 
                     }
                 );

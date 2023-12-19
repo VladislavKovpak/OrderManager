@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +11,7 @@ using TaskAuthenticationAuthorization.Models;
 
 namespace TaskAuthenticationAuthorization.Controllers
 {
+    [Authorize]
     public class OrdersController : Controller
     {
         private readonly ShoppingContext _context;
@@ -22,7 +25,21 @@ namespace TaskAuthenticationAuthorization.Controllers
         public async Task<IActionResult> Index()
         {
             var shoppingContext = _context.Orders.Include(o => o.Customer).Include(o => o.SuperMarket);
-            return View(await shoppingContext.ToListAsync());
+
+            if (User.IsInRole("buyer"))
+            {
+                var email = User.Identity.Name;
+                return View(await shoppingContext.Where(u => u.Customer.Email == email).ToListAsync());
+            }
+            else
+            {
+                return View(await shoppingContext.ToListAsync());
+            }
+        }
+
+        public async Task<IActionResult> Discount()
+        {
+            return View();
         }
 
         // GET: Orders/Details/5
@@ -46,6 +63,7 @@ namespace TaskAuthenticationAuthorization.Controllers
         }
 
         // GET: Orders/Create
+        [Authorize(Roles = "admin")]
         public IActionResult Create()
         {
             ViewData["CustomerId"] = new SelectList(_context.Customers, "ID", "ID");
@@ -58,7 +76,8 @@ namespace TaskAuthenticationAuthorization.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,OrderDate,CustomerId,SuperMarketId")] Order order)
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> Create([Bind("Id,OrderDate,CustomerId,SuperMarketId,Discount")] Order order)
         {
             if (ModelState.IsValid)
             {
@@ -72,6 +91,7 @@ namespace TaskAuthenticationAuthorization.Controllers
         }
 
         // GET: Orders/Edit/5
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -94,6 +114,7 @@ namespace TaskAuthenticationAuthorization.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,OrderDate,CustomerId,SuperMarketId")] Order order)
         {
             if (id != order.Id)
@@ -127,6 +148,7 @@ namespace TaskAuthenticationAuthorization.Controllers
         }
 
         // GET: Orders/Delete/5
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -149,6 +171,7 @@ namespace TaskAuthenticationAuthorization.Controllers
         // POST: Orders/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var order = await _context.Orders.FindAsync(id);

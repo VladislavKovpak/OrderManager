@@ -1,4 +1,5 @@
 ﻿@model TaskAuthenticationAuthorization.Models.Customer
+@inject TaskAuthenticationAuthorization.Models.ShoppingContext shoppingContext
 
 @{
     ViewData["Title"] = "Edit";
@@ -29,9 +30,17 @@
                 <span asp-validation-for="Address" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Discount" class="control-label"></label>
-                <input asp-for="Discount" class="form-control" />
+                <label asp-for="@Model.Discount" class="control-label"></label>
+                @Html.DropDownListFor(m => m.Discount, new SelectList(Enum.GetValues(typeof(Discount))))
                 <span asp-validation-for="Discount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Role.Id" class="control-label"></label>
+                @{
+                    var roles = shoppingContext.Roles.ToList();
+                }
+                @Html.DropDownListFor(m => m.Role.Id, new SelectList(roles, "Id", "Name"))
+                <span asp-validation-for="Role.Id" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
