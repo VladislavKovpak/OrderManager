@@ -1,4 +1,5 @@
-﻿@model TaskAuthenticationAuthorization.Models.RegisterModel
+﻿@model TaskAuthenticationAuthorization.Models.RegisterViewModel
+
 
 <h2>Registration</h2>
 
@@ -7,23 +8,24 @@
     <div>
         <div>
             <label asp-for="Email">Enter Email</label><br />
-            <input type="text" asp-for="Email" />
+
+            <input type="email" asp-for="Email" />
             <span asp-validation-for="Email" />
         </div>
         <div>
             <label asp-for="Password">Enter password</label><br />
-            <input asp-for="Password" />
+
+            <input type="password" asp-for="Password" />
             <span asp-validation-for="Password" />
         </div>
         <div>
-            <label asp-for="PasswordConfirm">Confirm Password</label><br />
-            <input asp-for="PasswordConfirm" />
-            <span asp-validation-for="PasswordConfirm" />
+            <label asp-for="ConfirmPassword">Confirm Password</label><br />
+            <input type="password" asp-for="ConfirmPassword" />
+            <span asp-validation-for="ConfirmPassword" />
         </div>
         <div>
             <input type="submit" value="Register" />
         </div>
     </div>
 </form>
-
 

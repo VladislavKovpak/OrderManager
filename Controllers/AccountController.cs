@@ -1,25 +1,44 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using TaskAuthenticationAuthorization.Models;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using TaskAuthenticationAuthorization.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Authentication;
-using System.Data;
-
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace TaskAuthenticationAuthorization.Controllers
 {
     public class AccountController : Controller
     {
-        private ShoppingContext db;
+        private readonly ShoppingContext _shoppingContext;
 
-        public AccountController(ShoppingContext context)
+        public AccountController(ShoppingContext shoppingContext)
         {
-            db = context;
+            _shoppingContext = shoppingContext;
+        }
+
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        private async Task Authenticate(Customer customer)
+        {
+            var claims = new List<Claim>
+                {
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, customer.Email),
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, customer.Role?.Name),
+                    new Claim("DiscountAccess", customer.Discount.Value.ToString())
+                };
+
+            // create ClaimsIdentity object
+            ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType,
+                ClaimsIdentity.DefaultRoleClaimType);
+            // set auth cookies
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
         }
 
         [HttpGet]
@@ -27,54 +46,71 @@ namespace TaskAuthenticationAuthorization.Controllers
         {
             return View();
         }
-
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterModel model)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
             {
-                Customer user = await db.Customers.FirstOrDefaultAsync(u => u.Email == model.Email);
-                if (user == null)
+                Customer customer = await _shoppingContext.Customers.FirstOrDefaultAsync(u => u.Email == model.Email);
+                if (customer == null)
                 {
-                    // add user to db
-                    user = new Customer { Email = model.Email, Password = model.Password, Discount = Discount.R };
-                    Role userRole = await db.Roles.FirstOrDefaultAsync(r => r.Name == "Buyer");
-                    if (userRole != null)
-                        user.Role = userRole;
+                    if (await _shoppingContext.Roles.FirstOrDefaultAsync(r => r.Name == "buyer") == null)
+                    {
+                        _shoppingContext.Roles.Add(new Role { Name = "buyer" });
+                        await _shoppingContext.SaveChangesAsync();  
+                    }
 
-                    db.Customers.Add(user);
-                    await db.SaveChangesAsync();
+                    Role userRole = await _shoppingContext.Roles.FirstOrDefaultAsync(r => r.Name == "buyer");
+                    customer = new Customer { Email = model.Email, Password = model.Password, Role = userRole, Discount = Discount.regular };
+                   
+                    _shoppingContext.Customers.Add(customer);
+                    await _shoppingContext.SaveChangesAsync();
 
-                    await Authenticate(user);
+                    Customer customerToAuthorize = await _shoppingContext.Customers.FirstOrDefaultAsync(u => u.Email == model.Email);
 
+                    await Authenticate(customerToAuthorize);
+
+                  
                     return RedirectToAction("Index", "Home");
                 }
                 else
-                    ModelState.AddModelError("", "Incorrect login and (or) password");
+                    ModelState.AddModelError("", "Incorrect login and(or) password");
             }
             return View(model);
         }
-        private async Task Authenticate(Customer customer)
+
+        [HttpGet]
+        public IActionResult Login()
         {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, customer.Email),
-                new Claim(ClaimsIdentity.DefaultRoleClaimType, customer.Role?.Name)
-            };
-            // create ClaimsIdentity object
-            ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType,
-                ClaimsIdentity.DefaultRoleClaimType);
-            // set auth cookies
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+            return View();
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                Customer customer = await _shoppingContext.Customers.Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == model.Email && u.Password == model.Password);
+                if (customer != null)
+                {
+                    await Authenticate(customer);
+
+                    return RedirectToAction("Index", "Home");
+                }
+
+                ModelState.AddModelError("", "Incorrect login and(or) password");
+            }
+
+            return View(model);
+        }
+
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Account");
         }
-
 
     }
 }

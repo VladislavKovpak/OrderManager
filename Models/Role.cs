@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 
 namespace TaskAuthenticationAuthorization.Models
 {
@@ -12,6 +14,5 @@ namespace TaskAuthenticationAuthorization.Models
         {
             Customers = new List<Customer>();
         }
-
     }
 }
