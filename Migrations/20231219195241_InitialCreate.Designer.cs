@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskAuthenticationAuthorization.Models;
 
@@ -11,16 +12,17 @@ using TaskAuthenticationAuthorization.Models;
 namespace TaskAuthenticationAuthorization.Migrations
 {
     [DbContext(typeof(ShoppingContext))]
-    partial class ShoppingContextModelSnapshot : ModelSnapshot
+    [Migration("20231219195241_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "6.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
             modelBuilder.Entity("TaskAuthenticationAuthorization.Models.Customer", b =>
                 {
@@ -28,8 +30,7 @@ namespace TaskAuthenticationAuthorization.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
 
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
@@ -37,24 +38,13 @@ namespace TaskAuthenticationAuthorization.Migrations
                     b.Property<int?>("Discount")
                         .HasColumnType("int");
 
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Password")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("RoleId")
-                        .HasColumnType("int");
-
                     b.HasKey("ID");
-
-                    b.HasIndex("RoleId");
 
                     b.ToTable("Customers");
                 });
@@ -65,8 +55,7 @@ namespace TaskAuthenticationAuthorization.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
@@ -92,7 +81,7 @@ namespace TaskAuthenticationAuthorization.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
@@ -118,7 +107,7 @@ namespace TaskAuthenticationAuthorization.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -131,29 +120,14 @@ namespace TaskAuthenticationAuthorization.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("TaskAuthenticationAuthorization.Models.Role", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Roles");
-                });
             modelBuilder.Entity("TaskAuthenticationAuthorization.Models.SuperMarket", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
@@ -165,16 +139,24 @@ namespace TaskAuthenticationAuthorization.Migrations
                     b.ToTable("SuperMarkets");
                 });
 
-
-            modelBuilder.Entity("TaskAuthenticationAuthorization.Models.Customer", b =>
+            modelBuilder.Entity("TaskAuthenticationAuthorization.Models.User", b =>
                 {
-                    b.HasOne("TaskAuthenticationAuthorization.Models.Role", "Role")
-                        .WithMany("Customers")
-                        .HasForeignKey("RoleId");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.Navigation("Role");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
                 });
-
 
             modelBuilder.Entity("TaskAuthenticationAuthorization.Models.Order", b =>
                 {
@@ -228,13 +210,6 @@ namespace TaskAuthenticationAuthorization.Migrations
                 {
                     b.Navigation("OrderDetails");
                 });
-
-
-            modelBuilder.Entity("TaskAuthenticationAuthorization.Models.Role", b =>
-                {
-                    b.Navigation("Customers");
-                });
-
 
             modelBuilder.Entity("TaskAuthenticationAuthorization.Models.SuperMarket", b =>
                 {

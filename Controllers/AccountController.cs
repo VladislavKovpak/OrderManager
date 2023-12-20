@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using TaskAuthenticationAuthorization.Models;
 using System.Threading.Tasks;
@@ -13,7 +13,6 @@ namespace TaskAuthenticationAuthorization.Controllers
 {
     public class AccountController : Controller
     {
-
         private readonly ShoppingContext _shoppingContext;
 
         public AccountController(ShoppingContext shoppingContext)
@@ -47,7 +46,6 @@ namespace TaskAuthenticationAuthorization.Controllers
         {
             return View();
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
@@ -113,5 +111,6 @@ namespace TaskAuthenticationAuthorization.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Account");
         }
+
     }
 }

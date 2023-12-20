@@ -10,6 +10,7 @@ using TaskAuthenticationAuthorization.Models;
 
 namespace TaskAuthenticationAuthorization.Controllers
 {
+
     [Authorize(Roles = "admin")]
     public class CustomersController : Controller
     {
