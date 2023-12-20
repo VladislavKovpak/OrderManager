@@ -14,6 +14,7 @@ namespace TaskAuthenticationAuthorization
             {
                 return;   // DB has been seeded
             }
+
             context.Products.AddRange(
                     new Product
                     {
@@ -32,13 +33,30 @@ namespace TaskAuthenticationAuthorization
                     }
                 );
             context.SaveChanges();
+
+            context.Roles.AddRange(
+                new Role { Name = "admin" },
+                new Role { Name = "buyer" }
+                );
+            context.SaveChanges();
+
             context.Customers.AddRange(
+                    new Customer
+                    {
+                        FirstName = "Admin",
+                        Email = "admin@gmail.com",
+                        Password = "admin123",
+                        LastName = "Admin",
+                        Address = "Rio de Zhmerinka",
+                        Role = context.Roles.FirstOrDefault(r => r.Name == "admin")
+                    },
                     new Customer
                     {
                         FirstName = "Ostap",
                         LastName = "Bender",
                         Address = "Rio de Zhmerinka",
-                        Discount = Discount.O,
+                        Discount = Discount.wholesale,
+                        Role = context.Roles.FirstOrDefault(r => r.Name == "buyer")
 
                     },
                     new Customer
@@ -46,7 +64,7 @@ namespace TaskAuthenticationAuthorization
                         FirstName = "Shura",
                         LastName = "Balaganov",
                         Address = "Odessa",
-                        Discount = Discount.R,
+                        Discount = Discount.regular,
 
                     }
                 );
@@ -73,12 +91,12 @@ namespace TaskAuthenticationAuthorization
                         SuperMarketId = 1,
                         OrderDate = DateTime.Now,
                      },
-                        new Order
-                        {
-                            CustomerId = 1,
-                            SuperMarketId = 1,
-                            OrderDate = DateTime.Now,
-                         }
+                    new Order
+                    {
+                        CustomerId = 1,
+                        SuperMarketId = 1,
+                        OrderDate = DateTime.Now,
+                        }
                 );
             context.SaveChanges();
             context.OrderDetails.AddRange(
@@ -89,13 +107,16 @@ namespace TaskAuthenticationAuthorization
                         Quantity = 2
 
                     },
-                        new OrderDetail
-                        {
-                            OrderId = 2,
-                            ProductId = 2,
-                            Quantity = 1
-                        }
+                    new OrderDetail
+                    {
+                        OrderId = 2,
+                        ProductId = 2,
+                        Quantity = 1
+                    }
                 );
+            context.SaveChanges();
+
+
             context.SaveChanges();
         }
     }

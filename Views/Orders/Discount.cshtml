@@ -1,0 +1,13 @@
+﻿@{
+    var discountAccessClaims = User.Claims
+        .Where(c => c.Type == "DiscountAccess")
+        .Select(c => c.Value);
+}
+
+<h2>Discount Access Claims:</h2>
+<ul>
+    @foreach (var claimValue in discountAccessClaims)
+    {
+        <li>@claimValue</li>
+    }
+</ul>
