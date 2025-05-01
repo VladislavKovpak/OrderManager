@@ -1,23 +1,52 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/Q5ZFIAJN)
-# Sprint18.-Authentication-Authorization
-### The structure of the project is the same as in previous two sprints.
-### Please, differentiate access to the resources as described:
-###  
+Authentication & Authorization App
+This is a .NET Core MVC web application implementing authentication and authorization for managing products, supermarkets, customers, and orders.
 
-1. All users are allowed to see pages products and supermarkets
-2. Only user with role "admin" can create/edit/delete supermarket
-3. Only user with role "admin" can create/edit/delete product
-4. Only authenticated users can see the content of the Home page
-5. Only users with role "admin" can see page Customers
-6. User with role "admin" can see page *Orders* with orders from all users
-7. User with role "buyer" can see page *Orders* only with his own orders and cannot modify, create or delete orders
-8. Every buyer receives claim "buyerType" with possible values: "none", "regular", "golden", "wholesale".
-9. Only buyers with "golden", "wholesale" claim values have access to Discount page (*My Discount* tab in the main menu)
+Features
+✅ Public access:
 
-10. Implement *Register* page that creates user and assigns to him default role Buyer and type Regular
-11. Implement *Login* page that should be accessible through *Login* tab (link) in the main menu. When user is logged in the link should be changed to *Logout*
-12. **Implement Admin tab that is available only to users with Admin role.  On this tab user with an "admin" role can*
-	* See the list of all users
-	* Edit any user - ability to change his role and claim buyerType
-# 	
-*Note: if some action or view is forbidden for user, corresponding links or tabs should be hidden and action shouln't be accessible neither via link nor via url*
+View products
+
+View supermarkets
+
+✅ Authenticated users:
+
+Access home page
+
+✅ Admin users:
+
+Create/edit/delete supermarkets
+
+Create/edit/delete products
+
+View & manage all customers
+
+View all user orders
+
+Access the Admin tab to:
+
+See the list of all users
+
+Edit user roles and buyer type claims
+
+✅ Buyer users:
+
+View only their own orders (no modify/create/delete)
+
+Access the Discount page if their buyerType claim is gold or wholesale
+
+✅ Account management:
+
+Register page → creates a user with the default role Buyer and buyer type Regular
+
+Login/logout functionality with dynamic navigation links
+
+Technologies Used
+ASP.NET Core MVC
+
+Entity Framework Core
+
+Identity for authentication & authorization
+
+Razor Views
+
+Bootstrap (for UI styling)
