@@ -1,4 +1,4 @@
-Authentication & Authorization App
+Order Manager App
 This is a .NET Core MVC web application implementing authentication and authorization for managing products, supermarkets, customers, and orders.
 
 Features
